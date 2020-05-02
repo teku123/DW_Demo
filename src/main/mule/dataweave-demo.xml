@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c7e96062-560d-41e1-bd1a-2bb45f7f5647" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="dataweave-demoFlow" doc:id="f57e0233-524d-4143-b274-511925c57a26" >
+		<http:listener doc:name="Listener" doc:id="383ceb73-64ec-4eaa-864d-4c5130b0db9d" config-ref="HTTP_Listener_config" path="/dw_april11"/>
+		<set-variable value="" doc:name="Set Variable" doc:id="2752dd87-9633-4d57-9d44-3ac2d8c79481" variableName="totalPayload"/>
+		<ee:transform doc:name="Pluck: Useful for mapping an object into an array, pluck iterates over an object and returns an array of keys, values, or indices from the object." doc:id="1262b6e3-78ae-489f-a7d1-fc44aef85ce5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{"a":"b","c":"d"} pluck (value,key,index) -> { (index) : { (value):key} }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Pluck: This example uses pluck to iterate over each element within &lt;prices/&gt; and returns arrays of their keys, values, and indices. It uses anonymous parameters to capture them." doc:id="f490985f-efcd-4706-ab6a-73754efdda12" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var readXml = read("<prices>
+    <basic>9.99</basic>
+    <premium>53.00</premium>
+    <vip>398.99</vip>
+    </prices>", "application/xml")
+---
+"result" : {
+  "keys" : readXml.prices pluck($$),
+  "values" : readXml.prices pluck($) as Number,
+  "indices" : readXml.prices pluck($$$)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="flatten" doc:id="59395df0-6ded-435d-b4b1-88aea4425abc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+flatten (vars.*totalPayload ++ [payload])
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="now(): DateTime
+Returns a DateTime value for the current date and time." doc:id="64a403f7-c92c-4439-a5a7-64758ed94b28" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	nowCalled: now(),
+	nowCalledSpecificTimeZone: now() >> "America/New_York",
+	epochTime: now() as Number,
+	seconds: now().seconds,
+	minutes: now().minutes,
+	hour: now().hour,
+	day: now().day,
+	month: now().month,
+	year: now().year,
+	dayOfweek: now().dayOfWeek,
+	dayOfyear: now().dayOfYear,
+	formattedDate: now() as String {format: "y-MM-dd"}	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="OrderBy:This example sorts an array of people based on their age or name." doc:id="4bc9222a-f89d-4d48-9459-e5824f036dd6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[
+	{name: "Santiago", age: 42},
+	{name: "Leandro", age: 29}, 
+	{name: "Mariano", age: 35},
+	{name: "Abraham", age: 25},
+	{name: "Haymen", age: 19}, 
+	{name: "Aliganesh", age: 60}
+] orderBy (person) -> person.age]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="OrderBy:This example alphabetically orders the values of each object in the input array." doc:id="7cc9f0e6-b52d-462f-8e7b-a8d1e406d573" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[{ letter: "a" }, { letter: "z" }] orderBy($.letter)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dataweave-demoFlow1" doc:id="3b6c3d26-2b43-4bef-a93f-581ce6540188" >
+		<ee:transform doc:name="Pluck is used for mapping an object into an array." doc:id="64e60c9b-1605-417a-8839-14c1f6a3a11c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+var data = read("<student>
+	<name>Khanh</name>
+	<age>30</age>
+</student>", "application/xml")
+---
+result: {
+	index: data.student pluck (value, key, index) -> index,
+	key: data.student pluck (value, key, index) -> key,
+	value: data.student pluck (value, key, index) -> value
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="pluck same way d/t method" doc:id="dc78564d-6e60-46b0-8598-7bcaf1f5ad27" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+var data = read("<student>
+	<name>Khanh</name>
+	<age>30</age>
+</student>", "application/xml")
+---
+result: {
+	index: data.student pluck ($$$),
+	key: data.student pluck ($$),
+	value: data.student pluck ($)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dataweave-demoFlow2" doc:id="62312f9f-c551-4a6f-ae65-a807bac6bebe" >
+		<ee:transform doc:name="pluck another example" doc:id="7e82b9c9-474e-4b74-97f3-fe749af3136f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+result: {
+  keys: payload.prices pluck $$,
+  values: payload.prices pluck $
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

@@ -1,0 +1,14 @@
+{
+  "sampleData": {
+    "b1335bc1-a99d-4425-bc59-1e40625603bd": {
+      "payload": "sample_data/unknown.dwl"
+    },
+    "59395df0-6ded-435d-b4b1-88aea4425abc": {
+      "payload": "sample_data/unknown_1.dwl",
+      "vars-totalPayload": "sample_data/defaultstringtype.dwl"
+    },
+    "7e82b9c9-474e-4b74-97f3-fe749af3136f": {
+      "payload": "sample_data/unknown_2.dwl"
+    }
+  }
+}

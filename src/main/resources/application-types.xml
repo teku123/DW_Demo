@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="input" format="json">
+      <types:shape format="weave" example="examples/pluck_inpute.json"><![CDATA[%dw 2.0
+
+type input = {|
+  data: Array<{|    name: String,     Id: Number {"typeId": "int"},     department: String  |}>
+|} {"example": "{\\\"data\\\":[{\\\"name\\\":\\\"Abadi\\\",\\\"Id\\\":101,\\\"department\\\":\\\"COTM\\\"},{\\\"name\\\":\\\"Teku\\\",\\\"Id\\\":10,\\\"department\\\":\\\"COTM\\\"},{\\\"name\\\":\\\"HermiKonjo\\\",\\\"Id\\\":111,\\\"department\\\":\\\"MD\\\"},{\\\"name\\\":\\\"Desta\\\",\\\"Id\\\":103,\\\"department\\\":\\\"MD\\\"},{\\\"name\\\":\\\"mersh\\\",\\\"Id\\\":121,\\\"department\\\":\\\"EEng\\\"},{\\\"name\\\":\\\"Ejigu\\\",\\\"Id\\\":12,\\\"department\\\":\\\"EEng\\\"}]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#b1335bc1-a99d-4425-bc59-1e40625603bd">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="input"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
